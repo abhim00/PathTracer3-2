@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>  
+    div.padded {  
+      padding-top: 0px;  
+      padding-right: 100px;  
+      padding-bottom: 0.25in;  
+      padding-left: 100px;  
+    }  
+  </style> 
+<title> Abhishek Mahesh  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+<br />
+<h1 align="middle">Assignment 3-2: PathTracer</h1>
+    <h2 align="middle">Abhishek and Somya | CS184-284</h2>
+
+    <div class="padded">
+        <h2 align="middle">Overview</h2>
+        <p>In this assignment we continued our path tracing project work by incorporating glass and ideal mirror materials (part 1), and simulating a thin lens to enable the depth of field effect. The glass material work added both refraction and reflection to our images according to Shlick’s coefficient. To render the glass objects, we reflected light rays across the image. In part 4, we use sampling on our lens disk to determine if an object will be in focus (if it is at focalDistance from the lens). 
+         </p>
+
+    <h2 align="middle">Part 1: Mirror and Glass Materials</h2>
+        <p>Settings: 256 samples per pixel, 4 samples per light</p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/1.png" width="480px" />
+                    <figcaption align="middle">When max_ray_depth = 0, we can only see when the object's light is sent directly towards the camera.</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/2.png" width="480px" />
+                    <figcaption align="middle">When max_ray_depth = 1, there is one bounce from the light bouncing/reflecting off the spheres and towards the camera. The actual mirrors of the spheres do not show up and mostly appear black. </figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/3.png" width="480px" />
+                    <figcaption align="middle">When max_ray_depth=3, the mirror ball appears as it should on the left and the ceiling is now lit up from the additional bounce. The glass ball on the right is still dark because we need another bounce for the light to pass through the ball.  </figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/4.png" width="480px" />
+                    <figcaption align="middle">In max_ray_depth=4, the right mirror ball is lit up properly and its shadow brightens as a result of light refracting inside the ball, but its reflection in the ball on the left remains dark. This is only solved in another light bounce.</figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/5.png" width="480px" />
+                    <figcaption align="middle">In max_ray_depth=5, the right ball can be seen in the left ball's reflection. Additionally, we can see added refraction of light on the wall to the right. </figcaption>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/6.png" width="480px" />
+                    <figcaption align="middle">In max_ray_depth = 100, we see a similar image as when max_ray_depth = 5, but this image is slightly brighter as a result of more bounces.</figcaption>
+                </tr>
+            </table>
+        </div>
+        <h2 align="middle">Part 4: Depth of Field</h2>
+        <p>
+            So far, we have been using the original pinhole camera simulation where everything we view is perfectly in focus. However, in this part we simulate a thin lens to enable the depth of field effect. Setting lens radius to 0 reduces the renderization to the standard pinhole camera model and modifying the lens radius will modify the lens aperture and will instead render with our new thin lens model. We do this because in real life, cameras and the human eye do not use a pinhole camera simulation and rather are more accurately related to the thin-lens simulation we implement in this problem. 
+
+
+        In reality, an ideal thin-lens has no thickness and but still simulates the reflective and refractive effects our eye does. The main difference between the thin-lens and the pinhole camera model is that now our image plane can receive light from any location and not just from the center.  As a result, we can use the pinhole camera ray to find the generated ray direction. Then we uniformly sample this disk representing the thin lens and we use the point in focus to calculate the ray that goes to that point in the thin-lens model.
+
+        </p>
+        <p align="middle"><pre align="middle">Focus Stack</pre></p>
+      <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/lr1fd4.png" width="480px" />
+            <figcaption align="middle">Lens Radius: 1.0 | Focal Distance: 4.0</figcaption>
+          </td>
+          <td>
+            <img src="images/lr1fd45.png" width="480px" />
+            <figcaption align="middle">Lens Radius: 1.0 | Focal Distance: 4.5</figcaption>
+          </td>
+        </tr>
+      </table>
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/lr1fd525.png" width="480px" />
+            <figcaption align="middle">Lens Radius: 1.0 | Focal Distance: 5.25</figcaption>
+          </td>
+          <td>
+            <img src="images/lr1fd12.png" width="480px" />
+            <figcaption align="middle">Lens Radius: 1.0 | Focal Distance: 12.0</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>  
+    <p align="middle"><pre align="middle">Pictures with different apperture sizes</pre></p>
+      <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/lr0fd40.png" width="480px" />
+            <figcaption align="middle">Lens Radius: 0.0 | Focal Distance: 4.0</figcaption>
+          </td>
+          <td>
+            <img src="images/lr05fd40.png" width="480px" />
+            <figcaption align="middle">Lens Radius: 0.5 | Focal Distance: 4.0</figcaption>
+          </td>
+        </tr>
+      </table>
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/lr15fd40.png" width="480px" />
+            <figcaption align="middle">Lens Radius: 1.5 | Focal Distance: 4.0</figcaption>
+          </td>
+          <td>
+            <img src="images/lr23fd40.png" width="480px" />
+            <figcaption align="middle">Lens Radius: 2.3 | Focal Distance: 4.0</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+</body>
+</html>
+
+
+
+
